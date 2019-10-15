@@ -70,11 +70,11 @@ void setup() {
     const unsigned int udpServerPort = 6789;
     const unsigned int udpLocalPort = 2500;
     Udp.begin(udpLocalPort);
-    String bcastString = "{\"mac\":\"";
+    String bcastString = "{\"dispositivo\":{\"mac\":\"";
     bcastString += WiFi.macAddress();
     bcastString += "\",\"uuid\":\"";
     bcastString += uuidStr;
-    bcastString += "\"}";
+    bcastString += "\"}}";
     char* bcastPacket;
     bcastString.toCharArray(bcastPacket, bcastString.length());
     int configured = 0;
