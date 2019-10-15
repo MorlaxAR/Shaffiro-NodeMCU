@@ -6,7 +6,7 @@
 #include <FS.h>
 #include <ESP8266TrueRandom.h>
 
-char* server = "test";
+char* server = "192.168.22.6";
 
 StaticJsonDocument<200> jsonDocument;
 JsonArray array;
@@ -19,8 +19,8 @@ void setup() {
   Serial.begin(115200);
 
 // WiFi Settings
-  const char* ssid     = "Torasso"; // WIFI SSID
-  const char* password = "monica03"; // WIFI PASSWORD
+  const char* ssid     = "LSI-4"; // WIFI SSID
+  const char* password = "lsi18lsi"; // WIFI PASSWORD
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.print("Intentando conectarse a la red: ");
@@ -38,11 +38,13 @@ void setup() {
 
 // uuid 
   SPIFFS.begin();
+  SPIFFS.format();
   String uuidStr = "";
   if (!SPIFFS.exists("/uuid.txt")) {
     Serial.println("Archivo /uuid.txt no encontrado, generando uno nuevo.");
     byte uuidNumber[16];
     ESP8266TrueRandom.uuid(uuidNumber);
+    
     uuidStr = ESP8266TrueRandom.uuidToString(uuidNumber);
     File uuid = SPIFFS.open("/uuid.txt","w");
     uuid.println(uuidStr);
@@ -73,14 +75,16 @@ void setup() {
     String bcastString = "{\"dispositivo\":{\"mac\":\"";
     bcastString += WiFi.macAddress();
     bcastString += "\",\"uuid\":\"";
-    bcastString += uuidStr;
+    bcastString += "9862d20e-6c84-4887-9cb8-855693f6b9c7";
+    //bcastString += uuidStr;
     bcastString += "\"}}";
-    char* bcastPacket;
-    bcastString.toCharArray(bcastPacket, bcastString.length());
+    char bcastPacket[255] = "";
+    bcastString.toCharArray(bcastPacket, 255);
     int configured = 0;
     while (!configured){
       delay(1000);
       Udp.beginPacket(server, udpServerPort);
+      Serial.println(bcastPacket);
       Udp.write(bcastPacket);
       Udp.endPacket();
       Serial.println("Paquete de descubrimiento enviado!\n");
