@@ -143,14 +143,14 @@ void setup() {
   //JSON Parse
   DeserializationError err = deserializeJson(configJson, configStr);
   if(err) {
-    Serial.print(F("deserializeJson() failed with code "));
+    Serial.print(F("deserializeJson() falló con código "));
     Serial.println(err.c_str());
   }
   else {
     nombreDispositivo = configJson["nombreDispositivo"];
     tipoDispositivo = configJson["tipoDispositivo"];
     dataTopic = configJson["topic"];
-    Serial.println("Json deserializado con exito\n");
+    Serial.println("Json deserializado con exito");
   }
 
   // Configuración MQTT Broker
