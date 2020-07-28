@@ -182,6 +182,7 @@ void setup() {
   }
   else if (strcmp(tipoDispositivo,"ACTUADOR") == 0) {
     Serial.println("tipoDispositivo es ACTUADOR");
+    client.subscribe(dataTopic);
     client.setCallback(callback);
     pinMode(pinDispositivo, OUTPUT);
   }
