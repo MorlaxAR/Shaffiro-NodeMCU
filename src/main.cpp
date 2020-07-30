@@ -9,8 +9,8 @@
 #include <BH1750.h>
 
 //Global Variables
-char* server = "35.208.43.150"; //Server IP
-int pinDispositivo = 2; //Pin Relay
+char* server = "35.208.43.150";
+int pinDispositivo = 5;
 const char* dataTopic = "";
 const char* tipoDispositivo = "";
 const char* nombreDispositivo = "";
@@ -31,11 +31,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println(mensaje);
   if (mensaje.equals("1")){
     Serial.println("Encendiendo Actuador!");
-    digitalWrite(pinDispositivo, LOW);
+    digitalWrite(pinDispositivo, HIGH);
   }
   else if  (mensaje.equals("0")){
     Serial.println("Apagando Actuador!");
-    digitalWrite(pinDispositivo, HIGH);
+    digitalWrite(pinDispositivo, LOW);
+    
   }
 }
 
@@ -44,7 +45,7 @@ void setup() {
 
   // WiFi Settings
   const char* ssid     = "SSID"; // WIFI SSID
-  const char* password = "PASSWORD"; // WIFI PASSWORD
+  const char* password = "PASS"; // WIFI PASSWORD
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.print("Intentando conectarse a la red: ");
@@ -93,7 +94,7 @@ void setup() {
   if (!SPIFFS.exists("/config.txt")) {
     Serial.println("Archivo de configuración no encontrado, solicitando configuración");
     const unsigned int udpServerPort = 6789;
-    const unsigned int udpLocalPort = 2500; //Debe ser único entre dispositivos detrás de NAT
+    const unsigned int udpLocalPort = 2501; // Debe ser único si el dispositivo está detrás de NAT
     uuidStr.trim();
     String localPortStr = String(udpLocalPort); 
     Udp.begin(udpLocalPort);
@@ -108,7 +109,7 @@ void setup() {
     bcastString.toCharArray(bcastPacket, 255);
     int configured = 0;
     while (!configured){
-      delay(1000);
+      delay(3000);
       Udp.beginPacket(server, udpServerPort);
       Serial.println(bcastPacket);
       Udp.write(bcastPacket);
@@ -185,6 +186,7 @@ void setup() {
     client.subscribe(dataTopic);
     client.setCallback(callback);
     pinMode(pinDispositivo, OUTPUT);
+    digitalWrite(pinDispositivo, LOW);
   }
   else {
     Serial.println("tipoDispositivo no reconocido");
@@ -198,7 +200,7 @@ void loop() {
     sprintf(luxStr, "%u", lux);
     Serial.printf("Light: %s lx\n",luxStr);
     client.publish(dataTopic,luxStr);
-    delay(1000);
+    delay(3000);
   }
   client.loop();
 }
